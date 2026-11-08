@@ -2,8 +2,9 @@
 Fails closed when an installed runtime package cannot be mapped to its build recipe.
 """
 import hashlib,json,os,pathlib,re,shutil,struct,subprocess,tarfile,time,urllib.request
-out=pathlib.Path('qemu-build-output').resolve(); binary=out/'binary'; prefix=pathlib.Path('/mingw64')
 def command(*args,**kwargs):return subprocess.check_output(args,text=True,**kwargs).strip()
+out=pathlib.Path('qemu-build-output').resolve(); binary=out/'binary'; prefix=pathlib.Path(command('cygpath','-w','/mingw64'))
+cache=pathlib.Path(command('cygpath','-w','/var/cache/pacman/pkg'))
 def imports(path):
     b=path.read_bytes(); pe=struct.unpack_from('<I',b,60)[0]; n=struct.unpack_from('<H',b,pe+6)[0]; optsize=struct.unpack_from('<H',b,pe+20)[0]; opt=pe+24
     directory=opt+(112 if struct.unpack_from('<H',b,opt)[0]==0x20b else 96); rva=struct.unpack_from('<I',b,directory+8)[0]
@@ -27,7 +28,7 @@ while queue:
         seen.add(dll.lower()); source=prefix/'bin'/dll
         if source.exists():
             shutil.copy2(source,binary/dll);queue.append(source)
-            packages.add(command('pacman','-Qqo',str(source)))
+            packages.add(command('pacman','-Qqo','/mingw64/bin/'+dll))
         else:system.add(dll)
 headers={'User-Agent':'DYE-DiskShift-source-collector'}
 if os.environ.get('GH_TOKEN'):headers['Authorization']='Bearer '+os.environ['GH_TOKEN']
@@ -48,7 +49,7 @@ def download_tree(path,ref,dest):
 records=[];done=set()
 for package in sorted(packages):
     version=command('pacman','-Q',package).split()[1]
-    archives=list(pathlib.Path('/var/cache/pacman/pkg').glob(package+'-'+version.replace(':','_')+'-*.pkg.tar.*'))
+    archives=list(cache.glob(package+'-'+version.replace(':','_')+'-*.pkg.tar.*'))
     archives=[p for p in archives if not p.name.endswith('.sig')]
     if not archives:raise RuntimeError('Original binary package missing: '+package+' '+version)
     archive=archives[0]
@@ -77,7 +78,7 @@ for package in sorted(packages):
     download_tree(base,match,dest)
     (dest/'DYE-UPSTREAM-COMMIT.txt').write_text(match+'\n',encoding='ascii')
     # makepkg verifies checksums and creates an all-source archive containing upstream tarballs/patches.
-    subprocess.run(['bash','-lc','cd "$1" && makepkg --allsource --skippgpcheck --noconfirm','source-archive',str(dest)],check=True)
+    subprocess.run(['bash','-lc','cd "$1" && makepkg --allsource --skippgpcheck --noconfirm','source-archive',dest.as_posix()],check=True)
     if not list(dest.glob('*.src.tar.*')):raise RuntimeError('All-source archive missing: '+base)
     records.append({'package':package,'version':version,'pkgbase':base,'recipeCommit':match})
 (out/'build-info'/'runtime-packages.json').write_text(json.dumps({'packages':records,'windowsSystemImports':sorted(system)},indent=2),encoding='utf-8')
