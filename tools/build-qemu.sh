@@ -20,12 +20,15 @@ python -c 'import pycotap, importlib.metadata; print("pycotap build dependency:"
 git archive --format=tar --prefix=qemu-11.1.3/ HEAD | gzip > "$OUT/sources/qemu-11.1.3.tar.gz"
 cp COPYING COPYING.LIB LICENSE "$OUT/licenses/"
 mkdir build && cd build
-../configure --enable-download --without-default-features --disable-system --disable-user --enable-tools --disable-docs --disable-guest-agent --disable-plugins --disable-install-blobs 2>&1 | tee "$OUT/build-info/configure.log"
+../configure --enable-download --without-default-features --disable-system --disable-user --enable-tools --enable-vhdx --enable-vmdk --enable-vpc --enable-parallels --enable-zstd --disable-docs --disable-guest-agent --disable-plugins --disable-install-blobs 2>&1 | tee "$OUT/build-info/configure.log"
 ninja qemu-img.exe 2>&1 | tee "$OUT/build-info/build.log"
 cp qemu-img.exe "$OUT/binary/"
 cp config-host.mak config.log meson-info/intro-buildoptions.json "$OUT/build-info/" || true
 ./qemu-img.exe --version | tee "$OUT/build-info/version.txt"
 ./qemu-img.exe --help > "$OUT/build-info/formats.txt"
+for format in parallels vhdx vmdk vpc qcow2 raw; do
+    grep -qw "$format" "$OUT/build-info/formats.txt"
+done
 pacman -Q > "$OUT/build-info/all-build-packages.txt"
 gcc --version > "$OUT/build-info/compiler.txt"
 cd "$ROOT"
