@@ -1,7 +1,14 @@
 name: Build traceable qemu-img bundle
-on: workflow_dispatch
+on:
+  workflow_dispatch:
+    inputs:
+      reuse_run:
+        description: 'Optional completed run ID: reuse its already compiled binary, verifying runtime versions'
+        required: false
+        default: ''
 permissions:
   contents: read
+  actions: read
 jobs:
   build:
     runs-on: windows-latest
@@ -25,7 +32,17 @@ jobs:
             mingw-w64-x86_64-ninja
             mingw-w64-x86_64-pkgconf
       - name: Build minimal tools
+        if: inputs.reuse_run == ''
         run: bash tools/build-qemu.sh
+      - name: Reuse completed build artifact
+        if: inputs.reuse_run != ''
+        shell: pwsh
+        env:
+          GH_TOKEN: ${{ github.token }}
+          REUSE_RUN: ${{ inputs.reuse_run }}
+        run: |
+          if ($env:REUSE_RUN -notmatch '^\d+$') { throw 'Invalid run ID' }
+          gh run download $env:REUSE_RUN --name traceable-qemu-img --dir qemu-build-output
       - name: Collect dependency sources
         env:
           GH_TOKEN: ${{ github.token }}

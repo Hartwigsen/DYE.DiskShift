@@ -5,6 +5,8 @@ import hashlib,json,os,pathlib,re,shutil,struct,subprocess,tarfile,time,urllib.r
 def command(*args,**kwargs):return subprocess.check_output(args,text=True,**kwargs).strip()
 out=pathlib.Path('qemu-build-output').resolve(); binary=out/'binary'; prefix=pathlib.Path(command('cygpath','-w','/mingw64'))
 cache=pathlib.Path(command('cygpath','-w','/var/cache/pacman/pkg'))
+cache.mkdir(parents=True,exist_ok=True)
+original_versions=dict(line.split(maxsplit=1) for line in (out/'build-info'/'all-build-packages.txt').read_text().splitlines() if line.strip())
 def imports(path):
     b=path.read_bytes(); pe=struct.unpack_from('<I',b,60)[0]; n=struct.unpack_from('<H',b,pe+6)[0]; optsize=struct.unpack_from('<H',b,pe+20)[0]; opt=pe+24
     directory=opt+(112 if struct.unpack_from('<H',b,opt)[0]==0x20b else 96); rva=struct.unpack_from('<I',b,directory+8)[0]
@@ -49,8 +51,12 @@ def download_tree(path,ref,dest):
 records=[];done=set()
 for package in sorted(packages):
     version=command('pacman','-Q',package).split()[1]
+    if original_versions.get(package)!=version:raise RuntimeError('Runtime package drift since compile: '+package)
     archives=list(cache.glob(package+'-'+version.replace(':','_')+'-*.pkg.tar.*'))
     archives=[p for p in archives if not p.name.endswith('.sig')]
+    if not archives:
+        subprocess.run(['pacman','-Sw','--noconfirm','--cachedir',command('cygpath','-u',str(cache)),package],check=True)
+        archives=[p for p in cache.glob(package+'-'+version.replace(':','_')+'-*.pkg.tar.*') if not p.name.endswith('.sig')]
     if not archives:raise RuntimeError('Original binary package missing: '+package+' '+version)
     archive=archives[0]
     info=command('bsdtar','-xOf',str(archive),'.PKGINFO')
@@ -89,6 +95,7 @@ for package in sorted(packages):
     if not list(dest.glob('*.src.tar.*')):raise RuntimeError('All-source archive missing: '+base)
     records.append({'package':package,'version':version,'pkgbase':base,'recipeCommit':match})
 (out/'build-info'/'runtime-packages.json').write_text(json.dumps({'packages':records,'windowsSystemImports':sorted(system)},indent=2),encoding='utf-8')
+shutil.copy2(__file__,out/'build-info'/'collect-qemu-sources.py')
 hashes={str(p.relative_to(out)).replace('\\','/'):hashlib.sha256(p.read_bytes()).hexdigest() for p in out.rglob('*') if p.is_file()}
 (out/'SHA256.json').write_text(json.dumps(hashes,indent=2),encoding='utf-8')
 (out/'SOURCE-COLLECTION-COMPLETE.txt').write_text('Dependency recipes and all-source archives collected successfully.\n',encoding='ascii')
