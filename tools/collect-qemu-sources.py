@@ -57,8 +57,15 @@ for package in sorted(packages):
     base=re.search(r'^pkgbase = (.+)$',info,re.M).group(1)
     package_info=out/'build-info'/('package-'+package+'.txt');package_info.write_text(info,encoding='utf-8')
     print('Runtime package:',package,version,'recipe:',base,flush=True)
-    lic=prefix/'share'/'licenses'/package
-    if lic.exists():shutil.copytree(lic,out/'licenses'/package,dirs_exist_ok=True)
+    for installed in command('pacman','-Qlq',package).splitlines():
+        if '/share/licenses/' in installed and not installed.endswith('/'):
+            license_file=pathlib.Path(command('cygpath','-w',installed))
+            relative=installed.split('/share/licenses/',1)[1]
+            destination=out/'licenses'/relative
+            if license_file.is_file():destination.parent.mkdir(parents=True,exist_ok=True);shutil.copy2(license_file,destination)
+    buildinfo=command('bsdtar','-xOf',str(archive),'.BUILDINFO')
+    (out/'build-info'/('build-'+package+'.txt')).write_text(buildinfo,encoding='utf-8')
+    recipe_hash=re.search(r'^pkgbuild_sha256sum = (.+)$',buildinfo,re.M)
     originals=out/'sources'/'original-binary-packages';originals.mkdir(exist_ok=True)
     shutil.copy2(archive,originals/archive.name)
     if (base,version) in done:continue
@@ -71,7 +78,7 @@ for package in sorted(packages):
             def value(name):
                 m=re.search(r'^'+name+r'=[\'\"]?([^\s\'\"#]+)',recipe,re.M);return m.group(1) if m else ''
             candidate=(value('epoch')+':' if value('epoch') else '')+value('pkgver')+'-'+value('pkgrel')
-            if candidate==version:match=sha;break
+            if candidate==version and (not recipe_hash or hashlib.sha256(recipe.encode()).hexdigest()==recipe_hash.group(1)):match=sha;break
         if match or not history:break
     if not match:raise RuntimeError('No exact recipe version for '+base+' '+version)
     dest=out/'sources'/'recipes'/base
