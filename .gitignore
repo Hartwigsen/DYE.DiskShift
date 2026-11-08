@@ -1,0 +1,26 @@
+# Build output and local tooling
+**/bin/
+**/obj/
+.vs/
+.vscode/
+Vorschau/
+Vorschau-Hilfe/
+Build-*/
+Release-*/
+*.zip
+# Disk images and local verification data
+test-results/
+*.hds
+*.vhd
+*.vhdx
+*.vmdk
+*.qcow2
+*.raw
+*.img
+# Credentials and local settings
+.env
+.env.*
+*.user
+*.pfx
+*.key
+
