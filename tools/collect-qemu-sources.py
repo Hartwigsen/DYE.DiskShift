@@ -91,7 +91,8 @@ for package in sorted(packages):
     download_tree(base,match,dest)
     (dest/'DYE-UPSTREAM-COMMIT.txt').write_text(match+'\n',encoding='ascii')
     # makepkg verifies checksums and creates an all-source archive containing upstream tarballs/patches.
-    subprocess.run(['bash','-lc','cd "$1" && makepkg --allsource --skippgpcheck --noconfirm','source-archive',dest.as_posix()],check=True)
+    msys_bash=prefix.parent/'usr'/'bin'/'bash.exe'
+    subprocess.run([str(msys_bash),'-lc','cd "$1" && makepkg --allsource --skippgpcheck --noconfirm','source-archive',dest.as_posix()],check=True)
     if not list(dest.glob('*.src.tar.*')):raise RuntimeError('All-source archive missing: '+base)
     records.append({'package':package,'version':version,'pkgbase':base,'recipeCommit':match})
 (out/'build-info'/'runtime-packages.json').write_text(json.dumps({'packages':records,'windowsSystemImports':sorted(system)},indent=2),encoding='utf-8')
