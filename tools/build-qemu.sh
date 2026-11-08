@@ -11,6 +11,12 @@ mkdir -p python/wheels "$OUT/sources/build-wheels"
 curl --fail --location 'https://files.pythonhosted.org/packages/36/f4/77b5a41d53ae3c530b204ed9a35137171b20f8ee0f337e2ec4993d6026a5/pycotap-1.3.1-py3-none-any.whl' -o python/wheels/pycotap-1.3.1-py3-none-any.whl
 echo '1c3a25b3ff89e48f4e00f1f71dbbc1642b4f65c65d416524d07e73492fff25ea  python/wheels/pycotap-1.3.1-py3-none-any.whl' | sha256sum --check
 cp python/wheels/*.whl "$OUT/sources/build-wheels/"
+# QEMU 10.2's wheel finder builds a file://D:/ URI on this Windows Python.
+# Expose the verified pure-Python wheel through PYTHONPATH instead of modifying QEMU.
+mkdir -p "$ROOT/build-pycotap"
+python -m zipfile -e python/wheels/pycotap-1.3.1-py3-none-any.whl "$ROOT/build-pycotap"
+export PYTHONPATH="$(cygpath -w "$ROOT/build-pycotap")"
+python -c 'import pycotap, importlib.metadata; print("pycotap build dependency:", importlib.metadata.version("pycotap"))'
 git archive --format=tar --prefix=qemu-10.2.0/ HEAD | gzip > "$OUT/sources/qemu-10.2.0.tar.gz"
 cp COPYING COPYING.LIB LICENSE "$OUT/licenses/"
 mkdir build && cd build
