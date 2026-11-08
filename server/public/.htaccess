@@ -1,0 +1,9 @@
+Options -Indexes
+DirectoryIndex index.html index.php
+RewriteEngine On
+RewriteCond %{HTTPS} !=on
+RewriteRule ^ https://diskshift.dye.de%{REQUEST_URI} [R=308,L]
+SetEnvIf Authorization "(.*)" HTTP_AUTHORIZATION=$1
+<FilesMatch "\.(sqlite|pem|json|log|ini)$">
+Require all denied
+</FilesMatch>
