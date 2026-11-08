@@ -1,7 +1,7 @@
 # Eigenes qemu-img-Komplettpaket
 
 ## Ziel
-Die nicht vollständig zugeordneten DLLs der früheren lokalen QEMU-Installation werden ersetzt. Buildquelle ist der offizielle QEMU-Tag v10.2.0, Commit `698104725efad4b29079d857dfdebbd804e34c99`. Es wird nur `qemu-img.exe` gebaut, kein VM-Emulator und keine Firmware ausgeliefert.
+Die nicht vollständig zugeordneten DLLs der früheren lokalen QEMU-Installation werden ersetzt. Buildquelle ist der offizielle QEMU-Tag v11.1.3, Commit `005c61c0ef6f6ae615283440b4bb7be51b2c6ddd`. Es wird nur `qemu-img.exe` gebaut, kein VM-Emulator und keine Firmware ausgeliefert.
 
 ## Build
 Workflow `.github/workflows/qemu-bundle.yml` manuell starten. Die Action-Versionen sind als Commit-Hashes festgelegt. Der Windows-Runner richtet MSYS2 MINGW64 ein. `build-qemu.sh` zeichnet Konfiguration, Compiler und installierte Paketversionen auf und archiviert den verwendeten QEMU-Quellstand.
@@ -20,3 +20,4 @@ Der Build-Runner lädt Pakete aus den aktuellen MSYS2-Repositories. Die verwende
 7. Erst dann Downloadseite und öffentliche Versionsdatei auf das Komplettpaket umstellen.
 
 Bei fehlendem Quellarchiv oder fehlgeschlagenem Test wird das Artefakt nicht als freigegebenes Komplettpaket bezeichnet. Die vollständigen Quelldateien sollen direkt bereitstehen; ein allgemeiner Projektlink oder eine unverbindliche Quellcode-Zusage genügt für diesen Ablauf nicht.
+
