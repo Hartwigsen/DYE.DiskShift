@@ -16,9 +16,7 @@ try {
     // Do not trust spoofable forwarding headers. Proxy deployments must supply a verified REMOTE_ADDR.
     $ip=hash_hmac('sha256',$_SERVER['REMOTE_ADDR']??'unknown',$c['signing_secret']);
     if (!limit($db,'global',500) || !limit($db,'ip:'.$ip,30)) { header('Retry-After: 3600'); respond(429,['message'=>'Zu viele Anfragen. Bitte später erneut versuchen.']); }
-    $customer=hash('sha256',bearer()); $authorized=false;
-    foreach($c['support_hashes'] as $hash) if (hash_equals($hash,$customer)) $authorized=true;
-    if (!$authorized) respond(401,['message'=>'Support-Code ungültig oder gesperrt.']);
+    $customer='anonymous'; // No customer credentials; limits use a keyed IP hash.
     $raw=file_get_contents('php://input',false,null,0,3*1024*1024+1);
     if (strlen($raw)>3*1024*1024) respond(413,['message'=>'Bericht zu groß.']);
     try { $data=json_decode($raw,true,16,JSON_THROW_ON_ERROR); } catch (JsonException) { respond(400,['message'=>'Ungültiger Bericht.']); }
@@ -37,7 +35,7 @@ try {
     $db->exec('BEGIN IMMEDIATE');
     $q=$db->prepare('SELECT customer,digest FROM reports WHERE id=?'); $q->execute([$id]); $old=$q->fetch(PDO::FETCH_ASSOC);
     if ($old) { $db->exec('ROLLBACK'); if(!hash_equals($old['customer'],$customer)||!hash_equals($old['digest'],$digest)) respond(409,['message'=>'Berichtskennung bereits anderweitig verwendet.']); respond(202,['id'=>$id,'message'=>'Bericht bereits angenommen.']); }
-    if (!limit($db,'customer:'.$customer,5)) { $db->exec('COMMIT'); respond(429,['message'=>'Maximal fünf Berichte pro Stunde und Support-Code.']); }
+    if (!limit($db,'report-ip:'.$ip,5)) { $db->exec('COMMIT'); respond(429,['message'=>'Maximal fünf Berichte pro Stunde über diese Internetverbindung.']); }
     $used=(int)$db->query('SELECT COALESCE(SUM(length(body)),0) FROM reports')->fetchColumn();
     foreach(glob($c['storage'].'/*.png')?:[] as $file) $used+=filesize($file);
     if ($used+strlen($body)+strlen($image??'')>($c['max_storage_bytes']??500*1024*1024)) { $db->exec('ROLLBACK'); respond(503,['message'=>'Support-Speicher derzeit ausgelastet.']); }

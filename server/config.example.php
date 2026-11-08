@@ -4,7 +4,6 @@ return [
     'base_url' => 'https://diskshift.dye.de',
     'storage' => '/absolute/path/outside/webroot/diskshift-data',
     'signing_secret' => '', // at least 32 random bytes, represented as a 64-character hex string
-    'support_hashes' => [], // SHA256 hashes of independently revocable customer support codes
     'worker_password_hash' => '', // password_hash() of a separate cron password
     'app_id' => '',
     'installation_id' => '',

@@ -33,7 +33,7 @@ public sealed class InfoWindow : Window
         PreviewKeyDown += (_, e) => { if (e.Key == Key.Escape) Close(); };
     }
     private const string Help = """
-        DYE.DiskShift · Version 0.2.6
+        DYE.DiskShift · Version 0.2.7
 
         Diese Version konvertiert lokale virtuelle Festplatten mit dem mitgelieferten qemu-img. Die Quelldatei wird nur gelesen. Zur Konvertierung werden keine Image-Dateien hochgeladen. Fehlerberichte mit optionalem Screenshot sind ein gesonderter Vorgang mit ausdrücklicher Bestätigung.
 
@@ -91,16 +91,3 @@ public sealed class InfoWindow : Window
         Stand: 08.11.2026. Die MIT-Lizenz des eigenen Programms ersetzt keine Fremdlizenzen. Beim Weitergeben der QEMU-Komponenten müssen deren Lizenz- und Quellcodebedingungen erhalten bleiben. Siehe qemu/README-QUELLEN.txt und THIRD-PARTY.md.
         """;
 }
-
-
-
-
-
-
-
-
-
-
-
-
-

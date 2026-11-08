@@ -6,13 +6,14 @@ store=test/'private'; store.mkdir()
 code=secrets.token_urlsafe(36); secret=secrets.token_hex(32)
 config=test/'config.php'
 config.write_text("<?php return "+"['base_url'=>'https://diskshift.dye.de','storage'=>"+repr(str(store).replace('\\','/'))+",'signing_secret'=>'"+secret+"','support_hashes'=>['"+hashlib.sha256(code.encode()).hexdigest()+"'],'worker_password_hash'=>'','app_id'=>'','installation_id'=>'','private_key_file'=>'','owner'=>'Hartwigsen','repo'=>'DYE.DiskShift','max_storage_bytes'=>524288000];",encoding='utf-8')
+config.write_text(config.read_text(encoding='utf-8').replace("'support_hashes'=>['"+hashlib.sha256(code.encode()).hexdigest()+"'],", ''),encoding='utf-8')
 env=os.environ.copy();env['DISKSHIFT_CONFIG']=str(config)
 sock=socket.socket();sock.bind(('127.0.0.1',0));port=sock.getsockname()[1];sock.close()
 log=open(test/'php.log','w'); process=subprocess.Popen([php,'-S',f'127.0.0.1:{port}','-t',str(root/'server'/'public')],env=env,stdout=log,stderr=log,creationflags=subprocess.CREATE_NO_WINDOW)
 url=f'http://127.0.0.1:{port}/index.php'; results=[]
 def request(data=None,token=code,suffix=''):
     raw=None if data is None else json.dumps(data).encode()
-    req=urllib.request.Request(url+suffix,data=raw,headers={'Content-Type':'application/json','Authorization':'Bearer '+token})
+    req=urllib.request.Request(url+suffix,data=raw,headers={'Content-Type':'application/json',**({'Authorization':'Bearer '+token} if token else {})})
     try:
         with urllib.request.urlopen(req,timeout=5) as r:return r.status,r.read()
     except urllib.error.HTTPError as e:return e.code,e.read()
@@ -29,7 +30,7 @@ try:
         try:request();break
         except OSError:time.sleep(.1)
     check('GET ohne Bild ist nicht erlaubt',lambda:expect(405))
-    check('Falscher Support-Code wird abgewiesen',lambda:expect(401,report(),secrets.token_urlsafe(36)))
+    check('Bericht ohne Support-Code angenommen',lambda:expect(202,report(),''))
     r=report()
     check('Bericht wird in Warteschlange gespeichert',lambda:expect(202,r))
     check('Wiederholung erzeugt keinen zweiten Bericht',lambda:expect(202,r))
@@ -44,8 +45,8 @@ try:
     check('Screenshot ohne gültige Signatur gesperrt',lambda:expect(403,suffix='?image='+image['id']+'&expires='+expires+'&signature=wrong'))
     check('Gültiger Bildlink liefert das Bild',lambda: (expect(200,suffix='?image='+image['id']+'&expires='+expires+'&signature='+sig)==png) or (_ for _ in ()).throw(AssertionError('Bild verändert')))
     check('Abgelaufener Link gesperrt',lambda:expect(403,suffix='?image='+image['id']+'&expires=1&signature='+sig))
-    for _ in range(3):expect(202,report())
-    check('Kundenlimit greift',lambda:expect(429,report()))
+    for _ in range(2):expect(202,report())
+    check('IP-Berichtslimit greift',lambda:expect(429,report()))
     check('Überlange Beschreibung abgewiesen',lambda:expect(400,dict(report(),problem='X'*5001)))
     check('Zu großer HTTP-Body abgewiesen',lambda:expect(413,dict(report(),problem='X'*(3*1024*1024))))
     check('Cron ohne Anmeldung gesperrt',lambda: expect(401,suffix='/../cron.php'))

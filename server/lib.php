@@ -1,10 +1,14 @@
 <?php
 declare(strict_types=1);
 function configuration(): array {
-    $path = getenv('DISKSHIFT_CONFIG') ?: dirname(__DIR__) . '/diskshift-config.php';
+    $path = getenv('DISKSHIFT_CONFIG');
+    if (!$path) {
+        $path = dirname(__DIR__) . '/diskshift-config.php';
+        if (!is_file($path)) $path = __DIR__ . '/diskshift-config.php';
+    }
     if (!is_file($path)) throw new RuntimeException('Service not configured');
     $c = require $path;
-    if (!is_array($c) || strlen($c['signing_secret'] ?? '') < 64 || empty($c['support_hashes']) || empty($c['storage'])) throw new RuntimeException('Invalid configuration');
+    if (!is_array($c) || strlen($c['signing_secret'] ?? '') < 64 || empty($c['storage'])) throw new RuntimeException('Invalid configuration');
     if (!preg_match('~^https://[a-z0-9.-]+$~i', $c['base_url'] ?? '')) throw new RuntimeException('HTTPS base URL required');
     if (!is_dir($c['storage']) && !mkdir($c['storage'], 0700, true)) throw new RuntimeException('Storage unavailable');
     $storage = realpath($c['storage']); $public = realpath(__DIR__ . '/public');

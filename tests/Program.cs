@@ -35,10 +35,9 @@ if(args.Length > 1) await Check("Reales Parallels-Image nur lesend erkennen", as
 await Check("Updatevergleich erkennt neuere Version", () => { var r=Updates.Parse("[{\"draft\":false,\"tag_name\":\"v0.2.4\",\"html_url\":\"https://github.com/Hartwigsen/DYE.DiskShift/releases/tag/v0.2.4\"}]",new Version(0,2,3)); if(r.Url==null) throw new Exception("Update fehlt"); return Task.CompletedTask; });
 await Check("Gleiche Version ist kein Update", () => { var r=Updates.Parse("[{\"draft\":false,\"tag_name\":\"v0.2.3\",\"html_url\":\"https://github.com/Hartwigsen/DYE.DiskShift/releases/tag/v0.2.3\"}]",new Version(0,2,3)); if(r.Url!=null) throw new Exception("Falsches Update"); return Task.CompletedTask; });
 await Check("Fremde Release-URL wird ignoriert", () => { var r=Updates.Parse("[{\"draft\":false,\"tag_name\":\"v9.0.0\",\"html_url\":\"https://example.com/release\"}]",new Version(0,2,3)); if(r.Url!=null) throw new Exception("Fremdes Ziel"); return Task.CompletedTask; });
-await Check("Support-Client erkennt Empfangsbestätigung", async () => { var r=await SupportClient.Send(new{id=Guid.NewGuid()},new string('x',48),new ReplyHandler(202,"{\"id\":\"671c6730-79cb-4a54-8b76-c5904a28e49e\",\"message\":\"Angenommen\"}")); if(!r.Contains("Angenommen"))throw new Exception("Bestätigung fehlt"); });
-await Check("Support-Client weist ungültigen Code vor Netzwerk ab", async () => { try { await SupportClient.Send(new{},"kurz",new ReplyHandler(202,"{}")); } catch(IOException) {return;} throw new Exception("Code akzeptiert"); });
-await Check("Support-Client behandelt HTML statt JSON", async () => { try { await SupportClient.Send(new{},new string('x',48),new ReplyHandler(200,"<html>nicht eingerichtet</html>")); } catch(IOException) {return;} throw new Exception("HTML akzeptiert"); });
-await Check("Support-Client zeigt Zugriffssperre", async () => { try { await SupportClient.Send(new{},new string('x',48),new ReplyHandler(401,"{\"message\":\"Code gesperrt\"}")); } catch(IOException ex) {if(ex.Message.Contains("gesperrt"))return;} throw new Exception("Sperre fehlt"); });
+await Check("Support-Client erkennt Empfangsbestätigung", async () => { var r=await SupportClient.Send(new{id=Guid.NewGuid()},new ReplyHandler(202,"{\"id\":\"671c6730-79cb-4a54-8b76-c5904a28e49e\",\"message\":\"Angenommen\"}")); if(!r.Contains("Angenommen"))throw new Exception("Bestätigung fehlt"); });
+await Check("Support-Client behandelt HTML statt JSON", async () => { try { await SupportClient.Send(new{},new ReplyHandler(200,"<html>nicht eingerichtet</html>")); } catch(IOException) {return;} throw new Exception("HTML akzeptiert"); });
+await Check("Support-Client zeigt Zugriffssperre", async () => { try { await SupportClient.Send(new{},new ReplyHandler(401,"{\"message\":\"Code gesperrt\"}")); } catch(IOException ex) {if(ex.Message.Contains("gesperrt"))return;} throw new Exception("Sperre fehlt"); });
 await Check("Komprimiertes QCOW2 nach VHDX mit Datenvergleich", async () => {
     var pattern=Path.Combine(folder,"Muster.raw"); await File.WriteAllBytesAsync(pattern,Enumerable.Repeat((byte)77,4*1024*1024).ToArray());
     var compressed=Path.Combine(folder,"Komprimiert.qcow2"); var start=new ProcessStartInfo(qemu){UseShellExecute=false,CreateNoWindow=true};
@@ -46,6 +45,7 @@ await Check("Komprimiertes QCOW2 nach VHDX mit Datenvergleich", async () => {
     using var p=Process.Start(start)!; await p.WaitForExitAsync(); if(p.ExitCode!=0)throw new Exception("Komprimierung fehlgeschlagen");
     await engine.Convert(compressed,Path.Combine(folder,"Dekomprimiert.vhdx"),"vhdx",true,new Progress<(double,string)>(),default);
 });
+await Check("Support-Client meldet fehlenden Dienst bei HTTP 404", async () => { try { await SupportClient.Send(new{},new ReplyHandler(404,"<html>Not Found</html>")); } catch(IOException ex) {if(ex.Message.Contains("404") && ex.Message.Contains("nicht eingerichtet"))return;} throw new Exception("404 nicht verständlich gemeldet"); });
 await File.WriteAllLinesAsync(Path.Combine(folder,"results.txt"),results);
 foreach(var result in results) Console.WriteLine(result);
 Environment.ExitCode=results.Any(r=>r.StartsWith("FAIL"))?1:0;
@@ -58,4 +58,3 @@ sealed class ReplyHandler(int code,string body):System.Net.Http.HttpMessageHandl
 {
  protected override Task<System.Net.Http.HttpResponseMessage> SendAsync(System.Net.Http.HttpRequestMessage request,CancellationToken token)=>Task.FromResult(new System.Net.Http.HttpResponseMessage((System.Net.HttpStatusCode)code){Content=new System.Net.Http.StringContent(body)});
 }
-
