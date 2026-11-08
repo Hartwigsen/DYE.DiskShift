@@ -1,1 +1,2 @@
-83ae9c569fa924b62408136ce20c93f0ac0327c4740740b296afb3bb5f9b9fce  DYE.DiskShift-0.2.5-App-win-x64.zip
+d7712ce66c066b9179bdfb607219f0bcf494a8ae480471a140b26915be65e887  DYE.DiskShift-0.2.6-Komplett-win-x64.zip
+315091d60a92d491958cef0828014e0d55ba7c35924c8e83f6b2aeb3bb282332  DYE.DiskShift-0.2.6-Drittanbieterquellen.zip

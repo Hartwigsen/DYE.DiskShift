@@ -1,7 +1,8 @@
 {
-  "sha256": "83ae9c569fa924b62408136ce20c93f0ac0327c4740740b296afb3bb5f9b9fce",
+  "download": "https://github.com/Hartwigsen/DYE.DiskShift/releases/download/v0.2.6/DYE.DiskShift-0.2.6-Komplett-win-x64.zip",
+  "sources": "https://github.com/Hartwigsen/DYE.DiskShift/releases/download/v0.2.6/DYE.DiskShift-0.2.6-Drittanbieterquellen.zip",
+  "sha256": "d7712ce66c066b9179bdfb607219f0bcf494a8ae480471a140b26915be65e887",
+  "qemuIncluded": true,
   "page": "https://diskshift.dye.de/downloads.html",
-  "download": "https://diskshift.dye.de/downloads/DYE.DiskShift-0.2.5-App-win-x64.zip",
-  "version": "0.2.5",
-  "qemuIncluded": false
+  "version": "0.2.6"
 }

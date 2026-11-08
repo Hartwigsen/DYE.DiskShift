@@ -1,28 +1,15 @@
-# Mitgelieferte QEMU-Komponenten
+# QEMU im Komplettpaket 0.2.6
 
-qemu-img 11.1.0 (v11.1.0-12130-ge470268ff4), aus C:\Program Files\qemu.
-Windows-Builds: https://qemu.weilnetz.de/w64/
-QEMU: https://www.qemu.org/ und https://github.com/qemu/qemu
+Enthalten ist qemu-img 11.1.3, gebaut aus offiziellem Tag v11.1.3 / Commit 005c61c0ef6f6ae615283440b4bb7be51b2c6ddd.
 
-qemu-dependencies.json enthält die rekursiv ermittelten PE-Importe.
-Die Windows-Systembibliotheken werden nicht mitgeliefert.
-Nicht benötigte Systememulatoren und Firmware sind nicht enthalten.
+Die frühere lokale QEMU-Installation wird für dieses Paket nicht verwendet.
+Alle sieben Runtime-Pakete sind über Originalpakete und deren Build-Metadaten passenden PKGBUILD-Versionen zugeordnet. Die Library-Lizenztexte und sieben vollständigen All-Source-Archive sind gesammelt. Das vollständige Artefakt umfasst 139 mit SHA256 geprüfte Dateien.
 
-Die Bibliotheken umfassen unter anderem GLib, gettext, libiconv, libffi,
-PCRE2, zlib, bzip2, Brotli, Zstandard, curl, OpenSSL, GnuTLS, GMP,
-Nettle/Hogweed, libtasn1, libidn2, libunistring, libpsl, p11-kit,
-libssh, libssh2, libnfs und MinGW-Laufzeitbibliotheken.
-Diese Komponenten haben eigene Lizenzbedingungen. QEMUs GPL-Text allein
-ersetzt deren Lizenz- und Quellcodepflichten nicht.
+Build: https://github.com/Hartwigsen/DYE.DiskShift/actions/runs/42504890094
+Quellen: https://github.com/Hartwigsen/DYE.DiskShift/releases/download/v0.2.6/DYE.DiskShift-0.2.6-Drittanbieterquellen.zip
 
-OFFEN vor externer / kommerzieller Weitergabe:
-- Vollständigen passenden QEMU-Build-Quellstand und Build-Skripte sichern.
-- Versionsgenaue Lizenztexte, Urheberhinweise und erforderliche Quellen der
-  mitgelieferten Bibliotheken zusammenstellen.
-- Endgültige Nutzungsbedingungen der eigenständigen DYE-GUI festlegen.
-Ein API-Lookup des Build-Kürzels e470268ff4 im stweil-GitHub-Mirror ergab
-keinen passenden Commit; ein beliebiger QEMU-Release-Quellstand wäre kein
-belegter Ersatz für den verwendeten Build.
+Paketliste: qemu/build-info/runtime-packages.json
+Lizenzen: qemu/licenses/
+Buildskripte und Quellarchive: separates Drittanbieterquellen-ZIP.
 
-Dieses Paket wurde lokal gebaut und getestet, ist aber noch kein fertig
-geprüftes kommerzielles Auslieferungspaket.
+Der eigene Anwendungscode ist MIT-lizenziert. QEMU und Fremdbibliotheken behalten ihre eigenen Lizenzbedingungen. Die Dateien sind versionsgenau zusammengestellt; daraus folgt keine allgemeine rechtliche Zertifizierung oder Garantie für fremde spätere Änderungen am Paket.

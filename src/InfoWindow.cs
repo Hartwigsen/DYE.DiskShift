@@ -33,9 +33,9 @@ public sealed class InfoWindow : Window
         PreviewKeyDown += (_, e) => { if (e.Key == Key.Escape) Close(); };
     }
     private const string Help = """
-        DYE.DiskShift · Version 0.2.5
+        DYE.DiskShift · Version 0.2.6
 
-        Diese Version konvertiert lokale virtuelle Festplatten mit separat installiertem qemu-img. Die Quelldatei wird nur gelesen. Es werden keine Daten hochgeladen.
+        Diese Version konvertiert lokale virtuelle Festplatten mit dem mitgelieferten qemu-img. Die Quelldatei wird nur gelesen. Zur Konvertierung werden keine Image-Dateien hochgeladen. Fehlerberichte mit optionalem Screenshot sind ein gesonderter Vorgang mit ausdrücklicher Bestätigung.
 
         1. Quelle auswählen
         Klicke auf „Datei auswählen …“ und wähle eine virtuelle Festplatte. Bei Parallels liegt die .hds-Datei häufig im .pvm-Paket unter einem .hdd-Ordner. Bei mehreren HDS-Dateien oder Snapshots zuerst die Zusammengehörigkeit prüfen; nicht beliebig eine Datei auswählen.
@@ -70,7 +70,7 @@ public sealed class InfoWindow : Window
         Kostenlose Windows-Oberfläche unter der MIT-Lizenz. Der eigene Quellcode ist öffentlich verfügbar: https://github.com/Hartwigsen/DYE.DiskShift . Lizenztext: LICENSE im Programmordner. Die Lizenzen der Fremdkomponenten gelten unabhängig davon.
 
         QEMU / qemu-img
-        QEMU wird im öffentlichen App-Paket nicht mitgeliefert. Bitte QEMU für Windows separat installieren: https://qemu.weilnetz.de/w64/ . Die App sucht qemu-img.exe unter C:\Program Files\qemu. Eine zusätzlich neben der App abgelegte QEMU-Installation wird bevorzugt. Die lokale Erprobung erfolgte mit qemu-img 11.1.0.
+        Enthalten ist ein eigener Build von qemu-img 11.1.3 aus dem offiziellen QEMU-Tag v11.1.3 (Commit 005c61c0ef6f6ae615283440b4bb7be51b2c6ddd), als separates Programm aufgerufen. Paketversionen, Lizenzen, Build-Unterlagen und Prüfsummen liegen im qemu-Unterordner. Die passenden vollständigen Drittanbieterquellen stehen neben dem Softwaredownload unter https://diskshift.dye.de/downloads.html und im GitHub-Release bereit.
 
         QEMU steht als Gesamtprojekt unter der GNU General Public License, Version 2 (GPLv2). Einzelne Bestandteile haben eigene kompatible Lizenzen. Maßgeblich sind die Angaben des konkret verwendeten Pakets und seiner Quelldateien.
 
@@ -88,9 +88,12 @@ public sealed class InfoWindow : Window
         https://github.com/dotnet/runtime
         https://github.com/dotnet/wpf
 
-        Stand: 08.11.2026. Das öffentliche App-Paket enthält kein QEMU. Für ein späteres Komplettpaket mit QEMU sind die vollständigen passenden Quellen und Lizenzunterlagen der QEMU-Abhängigkeiten noch zusammenzustellen.
+        Stand: 08.11.2026. Die MIT-Lizenz des eigenen Programms ersetzt keine Fremdlizenzen. Beim Weitergeben der QEMU-Komponenten müssen deren Lizenz- und Quellcodebedingungen erhalten bleiben. Siehe qemu/README-QUELLEN.txt und THIRD-PARTY.md.
         """;
 }
+
+
+
 
 
 

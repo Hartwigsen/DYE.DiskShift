@@ -38,33 +38,17 @@ public static class Updates
                 }
                 catch (Exception ex) when (ex is HttpRequestException or JsonException or OperationCanceledException or KeyNotFoundException or InvalidOperationException) { }
             }
-            string json;
-            var gh = Path.Combine(Environment.GetFolderPath(Environment.SpecialFolder.ProgramFiles), "GitHub CLI", "gh.exe");
-            if (File.Exists(gh))
-            {
-                var start = new ProcessStartInfo(gh) { UseShellExecute = false, CreateNoWindow = true, RedirectStandardOutput = true, RedirectStandardError = true };
-                start.ArgumentList.Add("api"); start.ArgumentList.Add("repos/Hartwigsen/DYE.DiskShift/releases?per_page=100");
-                using var process = Process.Start(start)!;
-                var output = process.StandardOutput.ReadToEndAsync(); var error = process.StandardError.ReadToEndAsync();
-                using var timeout = new CancellationTokenSource(TimeSpan.FromSeconds(15));
-                try { await process.WaitForExitAsync(timeout.Token); }
-                finally { if (!process.HasExited) process.Kill(true); }
-                json = await output; await error;
-                if (process.ExitCode != 0) return new("Updateprüfung nicht möglich. Für das private Repository muss die lokale GitHub-CLI mit einem berechtigten Konto angemeldet sein.");
-            }
-            else
-            {
-                using var client = new HttpClient { Timeout = TimeSpan.FromSeconds(15) };
-                client.DefaultRequestHeaders.UserAgent.ParseAdd("DYE.DiskShift/" + Current);
-                using var response = await client.GetAsync("https://api.github.com/repos/Hartwigsen/DYE.DiskShift/releases?per_page=100");
-                if (!response.IsSuccessStatusCode) return new("Updateprüfung nicht möglich: privates Repository oder eingeschränkter GitHub-Zugriff. Releases im Browser öffnen oder GitHub-CLI anmelden.");
-                json = await response.Content.ReadAsStringAsync();
-            }
+            using var client = new HttpClient { Timeout = TimeSpan.FromSeconds(15) };
+            client.DefaultRequestHeaders.UserAgent.ParseAdd("DYE.DiskShift/" + Current);
+            using var response = await client.GetAsync("https://api.github.com/repos/Hartwigsen/DYE.DiskShift/releases?per_page=100");
+            if (!response.IsSuccessStatusCode) return new("Updateprüfung derzeit nicht möglich. GitHub-Zugriff oder API-Limit prüfen; Releases können im Browser geöffnet werden.");
+            var json = await response.Content.ReadAsStringAsync();
             return Parse(json, Version.Parse(Current));
         }
         catch (Exception ex) when (ex is HttpRequestException or IOException or JsonException or OperationCanceledException or System.ComponentModel.Win32Exception or InvalidOperationException or FormatException)
         { return new("Updateprüfung derzeit nicht möglich. Netzwerk oder GitHub-Zugriff prüfen."); }
     }
 }
+
 
 
