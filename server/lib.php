@@ -45,8 +45,8 @@ function github(array $c, string $method, string $path, array $payload, string $
     $curl = curl_init('https://api.github.com' . $path);
     curl_setopt_array($curl, [CURLOPT_CUSTOMREQUEST=>$method, CURLOPT_RETURNTRANSFER=>true, CURLOPT_TIMEOUT=>25,
         CURLOPT_CONNECTTIMEOUT=>8, CURLOPT_PROTOCOLS=>CURLPROTO_HTTPS, CURLOPT_FOLLOWLOCATION=>false,
-        CURLOPT_HTTPHEADER=>['Authorization: Bearer ' . $token,'Accept: application/vnd.github+json','X-GitHub-Api-Version: 2026-03-10','User-Agent: DYE-DiskShift-Support','Content-Type: application/json'],
-        CURLOPT_POSTFIELDS=>json_encode($payload, JSON_THROW_ON_ERROR)]);
+        CURLOPT_HTTPHEADER=>['Authorization: Bearer ' . $token,'Accept: application/vnd.github+json','X-GitHub-Api-Version: 2026-03-10','User-Agent: DYE-DiskShift-Support','Content-Type: application/json']]);
+    if ($method !== 'GET') curl_setopt($curl, CURLOPT_POSTFIELDS, json_encode($payload, JSON_THROW_ON_ERROR));
     $raw = curl_exec($curl); $code = curl_getinfo($curl, CURLINFO_HTTP_CODE); curl_close($curl);
     if ($raw === false || $code < 200 || $code >= 300) throw new RuntimeException('GitHub request not confirmed');
     return json_decode($raw, true, 32, JSON_THROW_ON_ERROR);

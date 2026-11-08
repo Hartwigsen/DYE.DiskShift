@@ -67,7 +67,7 @@ public sealed class InfoWindow : Window
         """;
     private const string Licenses = """
         DYE.DiskShift
-        Eigenständige Windows-Oberfläche. Die endgültigen Nutzungs- und Vertriebsbedingungen sind noch nicht festgelegt. Dieser Hinweis erteilt keine zusätzliche Lizenz.
+        Kostenlose Windows-Oberfläche unter der MIT-Lizenz. Der eigene Quellcode ist öffentlich verfügbar: https://github.com/Hartwigsen/DYE.DiskShift . Lizenztext: LICENSE im Programmordner. Die Lizenzen der Fremdkomponenten gelten unabhängig davon.
 
         QEMU / qemu-img
         QEMU wird im öffentlichen App-Paket nicht mitgeliefert. Bitte QEMU für Windows separat installieren: https://qemu.weilnetz.de/w64/ . Die App sucht qemu-img.exe unter C:\Program Files\qemu. Eine zusätzlich neben der App abgelegte QEMU-Installation wird bevorzugt. Die lokale Erprobung erfolgte mit qemu-img 11.1.0.
@@ -91,6 +91,7 @@ public sealed class InfoWindow : Window
         Stand: 08.11.2026. Das öffentliche App-Paket enthält kein QEMU. Für ein späteres Komplettpaket mit QEMU sind die vollständigen passenden Quellen und Lizenzunterlagen der QEMU-Abhängigkeiten noch zusammenzustellen.
         """;
 }
+
 
 
 

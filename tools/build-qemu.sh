@@ -10,7 +10,7 @@ git rev-parse HEAD > "$OUT/build-info/qemu-commit.txt"
 git archive --format=tar --prefix=qemu-10.2.0/ HEAD | gzip > "$OUT/sources/qemu-10.2.0.tar.gz"
 cp COPYING COPYING.LIB LICENSE "$OUT/licenses/"
 mkdir build && cd build
-../configure --without-default-features --disable-system --disable-user --enable-tools --disable-docs --disable-guest-agent --disable-plugins --disable-install-blobs 2>&1 | tee "$OUT/build-info/configure.log"
+../configure --enable-download --without-default-features --disable-system --disable-user --enable-tools --disable-docs --disable-guest-agent --disable-plugins --disable-install-blobs 2>&1 | tee "$OUT/build-info/configure.log"
 ninja qemu-img.exe 2>&1 | tee "$OUT/build-info/build.log"
 cp qemu-img.exe "$OUT/binary/"
 cp config-host.mak config.log meson-info/intro-buildoptions.json "$OUT/build-info/" || true
@@ -20,3 +20,4 @@ pacman -Q > "$OUT/build-info/all-build-packages.txt"
 gcc --version > "$OUT/build-info/compiler.txt"
 cd "$ROOT"
 cp tools/build-qemu.sh tools/collect-qemu-sources.py "$OUT/build-info/"
+

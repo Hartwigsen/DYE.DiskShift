@@ -22,7 +22,7 @@ Beispiel (absolute Pfade an den Webspace anpassen):
 Benötigt: PHP >= 8.2, PDO SQLite mit SQLite >= 3.35 (RETURNING), mbstring, OpenSSL, cURL, fileinfo. Auf dem tatsächlichen ALL-INKL-Tarif prüfen. PHP-Fehleranzeige öffentlich deaktivieren; Logs außerhalb des Webverzeichnisses führen. upload_max_filesize/post_max_size mindestens 4M, memory_limit mindestens 64M. Der Dienst verarbeitet JSON statt klassischem Dateiupload; eigener Request-Grenzwert 3 MiB.
 
 ## GitHub App
-Unter dem Konto Hartwigsen eine GitHub App für diesen Dienst anlegen. Repository-Berechtigung **Issues: Read and write**, keine Contents-Schreibberechtigung. Nur für **Hartwigsen/DYE.DiskShift** installieren. Webhooks werden nicht benötigt. App-ID, Installation-ID und privaten PEM-Schlüssel in die Serverkonfiguration übernehmen; der Schlüssel bleibt auf dem Server.
+Unter dem Konto Hartwigsen eine GitHub App für diesen Dienst anlegen. Repository-Berechtigung **Issues: Read and write**, keine Contents-Schreibberechtigung. Nur für **Hartwigsen/DYE.DiskShift-Support** installieren. Webhooks werden nicht benötigt. App-ID, Installation-ID und privaten PEM-Schlüssel in die Serverkonfiguration übernehmen; der Schlüssel bleibt auf dem Server.
 
 Der Worker signiert einen RS256-JWT, fordert einen kurzlebigen Installationstoken an und begrenzt ihn erneut auf das Repository und Issues-Schreibzugriff. Es werden keine GitHub-Zugangsdaten an die Windows-App verteilt.
 
@@ -58,3 +58,6 @@ Kunden erhalten als Antwort ausschließlich Empfangsbestätigung und Berichtsken
 6. Löschung, Backups und Zustände `uncertain`/`sending` überwachen.
 
 Die Windows-App verwendet `https://diskshift.dye.de/index.php`. Der Domainname allein stellt den Dienst noch nicht bereit.
+
+Das Produkt-Repository Hartwigsen/DYE.DiskShift ist öffentlich. Das separate Support-Repository ist privat. Der Worker verweigert die Übermittlung an ein öffentliches Ziel. Bestehende Serverkonfigurationen müssen auf DYE.DiskShift-Support umgestellt und die GitHub App dort installiert werden.
+

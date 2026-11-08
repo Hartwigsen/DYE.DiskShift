@@ -30,4 +30,8 @@ diskshift-config.php
 *.sqlite-shm
 *.sqlite-wal
 *.pem
+**/__pycache__/
+qemu-source/
+qemu-build-output/
+QEMU-Verified-*/
 

@@ -1,3 +1,9 @@
+# Kostenlos und öffentlich · MIT-Lizenz
+
+DYE.DiskShift wird für alle kostenlos bereitgestellt. Der eigene Quellcode steht unter der MIT-Lizenz. QEMU und andere Fremdkomponenten behalten ihre eigenen Lizenzen. Das Support-Repository Hartwigsen/DYE.DiskShift-Support bleibt privat. Der nachvollziehbare QEMU-Neubau und die vollständige Quellsammlung für das Komplettpaket laufen noch.
+
+## Frühere Entwicklungsnotizen (teilweise durch diese Entscheidung überholt)
+
 # Aktueller Stand: öffentlicher App-Download 0.2.5
 
 Der Quellcode bleibt privat. Das Paket `DYE.DiskShift-Oeffentlicher-Download-Webspace.zip` enthält die Startseite, Downloadseite, öffentliche Versionsdatei und ein portables App-ZIP für den Upload nach diskshift.dye.de. Noch nicht von hier auf den Webspace übertragen.
@@ -59,5 +65,6 @@ Der Versionsknopf öffnet den Release-Tag der tatsächlich laufenden Programmver
 Fehler melden öffnet ein eigenes Fenster mit Zusammenfassung, Problem, Reproduktionsschritten und erwartetem Ergebnis. Der Bericht kann kopiert oder in einem GitHub-Issueformular vorbereitet werden. Es wird kein Issue automatisch erstellt. Ein ausgewählter Screenshot muss im Browser selbst angehängt werden; Dateipfade und Logs werden nicht automatisch beigefügt.
 Beim Start erfolgt eine Updateprüfung, zusätzlich manuell über Updates. Neue Releases werden automatisch in einem Fenster angezeigt. Testreleases werden berücksichtigt. Ohne verfügbaren Zugriff wird kein Aktualitätsversprechen angezeigt. Das private Repository erfordert eine angemeldete GitHub-CLI unter dem Standard-Installationspfad; ohne CLI wird eine nicht authentifizierte API-Abfrage versucht, die bei privaten Repositories keinen Zugriff hat. Kein eingebauter Token und kein automatischer Download oder Programmaustausch.
 14 automatisierte Prüfungen bestanden (11 Konverterprüfungen und 3 Versionsvergleichsprüfungen); Bericht- und Updatefenster visuell geprüft. GitHub-Issues wurden beim Test nicht eingereicht.
+
 
 

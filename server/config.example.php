@@ -10,6 +10,6 @@ return [
     'installation_id' => '',
     'private_key_file' => '/absolute/path/outside/webroot/diskshift-app.pem',
     'owner' => 'Hartwigsen',
-    'repo' => 'DYE.DiskShift',
+    'repo' => 'DYE.DiskShift-Support',
     'max_storage_bytes' => 500 * 1024 * 1024,
 ];

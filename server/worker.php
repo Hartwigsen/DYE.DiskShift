@@ -8,6 +8,8 @@ function work(array $c): array {
     try {
         // Acquire credentials BEFORE claiming jobs: configuration/network errors here are safely retryable.
         $token=appToken($c);
+        $target=github($c,'GET','/repos/'.rawurlencode($c['owner']).'/'.rawurlencode($c['repo']),[],$token);
+        if (($target['private']??false)!==true) throw new RuntimeException('Support reports require a private repository');
         $jobs=$db->query("SELECT * FROM reports WHERE state='queued' ORDER BY created LIMIT 10")->fetchAll(PDO::FETCH_ASSOC);
         foreach($jobs as $job) {
             $q=$db->prepare("UPDATE reports SET state='sending' WHERE id=? AND state='queued'"); $q->execute([$job['id']]);
