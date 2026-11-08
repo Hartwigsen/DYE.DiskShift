@@ -35,6 +35,10 @@ if(args.Length > 1) await Check("Reales Parallels-Image nur lesend erkennen", as
 await Check("Updatevergleich erkennt neuere Version", () => { var r=Updates.Parse("[{\"draft\":false,\"tag_name\":\"v0.2.4\",\"html_url\":\"https://github.com/Hartwigsen/DYE.DiskShift/releases/tag/v0.2.4\"}]",new Version(0,2,3)); if(r.Url==null) throw new Exception("Update fehlt"); return Task.CompletedTask; });
 await Check("Gleiche Version ist kein Update", () => { var r=Updates.Parse("[{\"draft\":false,\"tag_name\":\"v0.2.3\",\"html_url\":\"https://github.com/Hartwigsen/DYE.DiskShift/releases/tag/v0.2.3\"}]",new Version(0,2,3)); if(r.Url!=null) throw new Exception("Falsches Update"); return Task.CompletedTask; });
 await Check("Fremde Release-URL wird ignoriert", () => { var r=Updates.Parse("[{\"draft\":false,\"tag_name\":\"v9.0.0\",\"html_url\":\"https://example.com/release\"}]",new Version(0,2,3)); if(r.Url!=null) throw new Exception("Fremdes Ziel"); return Task.CompletedTask; });
+await Check("Support-Client erkennt Empfangsbestätigung", async () => { var r=await SupportClient.Send(new{id=Guid.NewGuid()},new string('x',48),new ReplyHandler(202,"{\"id\":\"671c6730-79cb-4a54-8b76-c5904a28e49e\",\"message\":\"Angenommen\"}")); if(!r.Contains("Angenommen"))throw new Exception("Bestätigung fehlt"); });
+await Check("Support-Client weist ungültigen Code vor Netzwerk ab", async () => { try { await SupportClient.Send(new{},"kurz",new ReplyHandler(202,"{}")); } catch(IOException) {return;} throw new Exception("Code akzeptiert"); });
+await Check("Support-Client behandelt HTML statt JSON", async () => { try { await SupportClient.Send(new{},new string('x',48),new ReplyHandler(200,"<html>nicht eingerichtet</html>")); } catch(IOException) {return;} throw new Exception("HTML akzeptiert"); });
+await Check("Support-Client zeigt Zugriffssperre", async () => { try { await SupportClient.Send(new{},new string('x',48),new ReplyHandler(401,"{\"message\":\"Code gesperrt\"}")); } catch(IOException ex) {if(ex.Message.Contains("gesperrt"))return;} throw new Exception("Sperre fehlt"); });
 await File.WriteAllLinesAsync(Path.Combine(folder,"results.txt"),results);
 foreach(var result in results) Console.WriteLine(result);
 Environment.ExitCode=results.Any(r=>r.StartsWith("FAIL"))?1:0;
@@ -42,3 +46,8 @@ sealed class ImmediateProgress(Action<(double,string)> callback):IProgress<(doub
 
 
 
+
+sealed class ReplyHandler(int code,string body):System.Net.Http.HttpMessageHandler
+{
+ protected override Task<System.Net.Http.HttpResponseMessage> SendAsync(System.Net.Http.HttpRequestMessage request,CancellationToken token)=>Task.FromResult(new System.Net.Http.HttpResponseMessage((System.Net.HttpStatusCode)code){Content=new System.Net.Http.StringContent(body)});
+}

@@ -1,0 +1,7 @@
+{
+  "sha256": "83ae9c569fa924b62408136ce20c93f0ac0327c4740740b296afb3bb5f9b9fce",
+  "page": "https://diskshift.dye.de/downloads.html",
+  "download": "https://diskshift.dye.de/downloads/DYE.DiskShift-0.2.5-App-win-x64.zip",
+  "version": "0.2.5",
+  "qemuIncluded": false
+}

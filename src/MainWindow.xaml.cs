@@ -8,29 +8,27 @@ public partial class MainWindow : Window
     private string? target;
     private ImageDetails? details;
     private CancellationTokenSource? operation;
-    private readonly ConverterEngine engine = new(Path.Combine(AppContext.BaseDirectory, "qemu", "qemu-img.exe"));
+    private readonly ConverterEngine engine = new(FindQemu());
+    private static string FindQemu()
+    {
+        var bundled = Path.Combine(AppContext.BaseDirectory, "qemu", "qemu-img.exe");
+        if (File.Exists(bundled)) return bundled;
+        return Path.Combine(Environment.GetFolderPath(Environment.SpecialFolder.ProgramFiles), "qemu", "qemu-img.exe");
+    }
     private string Format => Vmdk?.IsChecked == true ? "vmdk" : Qcow?.IsChecked == true ? "qcow2" : "vhdx";
     public MainWindow()
     {
         InitializeComponent();
         PreviewKeyDown += (_, e) => { if (e.Key == System.Windows.Input.Key.F1) { ShowHelp(this, new RoutedEventArgs()); e.Handled = true; } };
         Closing += (_, e) => { if (operation != null) { e.Cancel = true; MessageBox.Show(this, "Bitte zuerst den laufenden Vorgang abbrechen und dessen Ende abwarten.", "Vorgang läuft"); } };
-        Loaded += async (_, _) => { try { EngineStatus.Text = (await engine.Version(CancellationToken.None)).Split('\n')[0].Trim(); } catch (Exception ex) { EngineStatus.Text = "QEMU nicht verfügbar"; Status.Text = ex.Message; } await RunUpdateCheck(false); };
+        Loaded += async (_, _) => { try { EngineStatus.Text = (await engine.Version(CancellationToken.None)).Split('\n')[0].Trim(); } catch (Exception) { EngineStatus.Text = "QEMU separat installieren"; Status.Text = "QEMU fehlt. Bitte QEMU für Windows installieren (Standardpfad: C:\\Program Files\\qemu)."; } await RunUpdateCheck(false); };
     }
     private void MinimizeWindow(object sender, RoutedEventArgs e) => WindowState = WindowState.Minimized;
     private void MaximizeWindow(object sender, RoutedEventArgs e) => WindowState = WindowState == WindowState.Maximized ? WindowState.Normal : WindowState.Maximized;
     private void CloseWindow(object sender, RoutedEventArgs e) => Close();
     private void OpenRelease(object sender, RoutedEventArgs e)
     {
-        var repository = typeof(MainWindow).Assembly.GetCustomAttributes(typeof(System.Reflection.AssemblyMetadataAttribute), false)
-            .Cast<System.Reflection.AssemblyMetadataAttribute>().FirstOrDefault(a => a.Key == "RepositoryUrl")?.Value;
-        if (!Uri.TryCreate(repository, UriKind.Absolute, out var uri) || uri.Scheme != "https" || uri.Host != "github.com")
-        {
-            MessageBox.Show(this, "Das GitHub-Repository ist für diesen Build noch nicht eingerichtet.", "Release-Informationen");
-            return;
-        }
-        try { System.Diagnostics.Process.Start(new System.Diagnostics.ProcessStartInfo(repository!.TrimEnd('/') + "/releases/tag/v" + (typeof(MainWindow).Assembly.GetName().Version?.ToString(3) ?? "0.2.2")) { UseShellExecute = true }); }
-        catch (Exception ex) { MessageBox.Show(this, "Die Release-Seite konnte nicht geöffnet werden: " + ex.Message); }
+        try { Updates.Open("https://diskshift.dye.de/downloads.html"); } catch (Exception ex) { MessageBox.Show(this, "Downloadseite konnte nicht geöffnet werden: " + ex.Message); }
     }
     private bool checkingUpdates;
     private void ShowReport(object sender, RoutedEventArgs e) => new ReportWindow(this).ShowDialog();
@@ -105,6 +103,8 @@ public partial class MainWindow : Window
     }
     private void Cancel(object sender, RoutedEventArgs e) { CancelButton.IsEnabled = false; operation?.Cancel(); Status.Text = "Vorgang wird abgebrochen …"; }
 }
+
+
 
 
 

@@ -33,9 +33,9 @@ public sealed class InfoWindow : Window
         PreviewKeyDown += (_, e) => { if (e.Key == Key.Escape) Close(); };
     }
     private const string Help = """
-        DYE.DiskShift · Version 0.2.3
+        DYE.DiskShift · Version 0.2.5
 
-        Diese Version konvertiert lokale virtuelle Festplatten mit dem mitgelieferten qemu-img. Die Quelldatei wird nur gelesen. Es werden keine Daten hochgeladen.
+        Diese Version konvertiert lokale virtuelle Festplatten mit separat installiertem qemu-img. Die Quelldatei wird nur gelesen. Es werden keine Daten hochgeladen.
 
         1. Quelle auswählen
         Klicke auf „Datei auswählen …“ und wähle eine virtuelle Festplatte. Bei Parallels liegt die .hds-Datei häufig im .pvm-Paket unter einem .hdd-Ordner. Bei mehreren HDS-Dateien oder Snapshots zuerst die Zusammengehörigkeit prüfen; nicht beliebig eine Datei auswählen.
@@ -70,7 +70,7 @@ public sealed class InfoWindow : Window
         Eigenständige Windows-Oberfläche. Die endgültigen Nutzungs- und Vertriebsbedingungen sind noch nicht festgelegt. Dieser Hinweis erteilt keine zusätzliche Lizenz.
 
         QEMU / qemu-img
-        Mitgeliefert und als separater Prozess aufgerufen: qemu-img 11.1.0 aus der lokalen QEMU-Windows-Installation, Versionskennung v11.1.0-12130-ge470268ff4. Herkunft der Windows-Binärpakete: https://qemu.weilnetz.de/w64/ . Die konkrete Dateiliste und Prüfsummen liegen im Paket.
+        QEMU wird im öffentlichen App-Paket nicht mitgeliefert. Bitte QEMU für Windows separat installieren: https://qemu.weilnetz.de/w64/ . Die App sucht qemu-img.exe unter C:\Program Files\qemu. Eine zusätzlich neben der App abgelegte QEMU-Installation wird bevorzugt. Die lokale Erprobung erfolgte mit qemu-img 11.1.0.
 
         QEMU steht als Gesamtprojekt unter der GNU General Public License, Version 2 (GPLv2). Einzelne Bestandteile haben eigene kompatible Lizenzen. Maßgeblich sind die Angaben des konkret verwendeten Pakets und seiner Quelldateien.
 
@@ -88,9 +88,13 @@ public sealed class InfoWindow : Window
         https://github.com/dotnet/runtime
         https://github.com/dotnet/wpf
 
-        Stand: 08.11.2026. Das Paket ist für lokale Erprobung vorbereitet. Die vollständigen passenden Quellen und Lizenzunterlagen aller QEMU-Abhängigkeiten sind noch nicht zusammengestellt; damit ist dieses Paket noch nicht zur kommerziellen Weitergabe vorbereitet.
+        Stand: 08.11.2026. Das öffentliche App-Paket enthält kein QEMU. Für ein späteres Komplettpaket mit QEMU sind die vollständigen passenden Quellen und Lizenzunterlagen der QEMU-Abhängigkeiten noch zusammenzustellen.
         """;
 }
+
+
+
+
 
 
 

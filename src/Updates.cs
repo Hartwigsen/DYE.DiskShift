@@ -26,6 +26,18 @@ public static class Updates
     {
         try
         {
+            using (var publicClient = new HttpClient { Timeout = TimeSpan.FromSeconds(10) })
+            {
+                try
+                {
+                    var feed = await publicClient.GetStringAsync("https://diskshift.dye.de/downloads.json");
+                    using var manifest = JsonDocument.Parse(feed);
+                    var item = manifest.RootElement;
+                    if (Version.TryParse(item.GetProperty("version").GetString(), out var available) && item.GetProperty("page").GetString() == "https://diskshift.dye.de/downloads.html")
+                        return available > Version.Parse(Current) ? new($"DYE.DiskShift {available} ist verfügbar.", "https://diskshift.dye.de/downloads.html") : new("Kein neueres öffentliches App-Paket verfügbar.");
+                }
+                catch (Exception ex) when (ex is HttpRequestException or JsonException or OperationCanceledException or KeyNotFoundException or InvalidOperationException) { }
+            }
             string json;
             var gh = Path.Combine(Environment.GetFolderPath(Environment.SpecialFolder.ProgramFiles), "GitHub CLI", "gh.exe");
             if (File.Exists(gh))
@@ -54,4 +66,5 @@ public static class Updates
         { return new("Updateprüfung derzeit nicht möglich. Netzwerk oder GitHub-Zugriff prüfen."); }
     }
 }
+
 

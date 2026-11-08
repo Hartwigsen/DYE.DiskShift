@@ -1,3 +1,12 @@
+# Aktueller Stand: öffentlicher App-Download 0.2.5
+
+Der Quellcode bleibt privat. Das Paket `DYE.DiskShift-Oeffentlicher-Download-Webspace.zip` enthält die Startseite, Downloadseite, öffentliche Versionsdatei und ein portables App-ZIP für den Upload nach diskshift.dye.de. Noch nicht von hier auf den Webspace übertragen.
+
+Das öffentliche App-Paket enthält .NET/WPF, aber **keine QEMU-Binärdateien**. QEMU separat vom Anbieter installieren; Standardpfad C:\Program Files\qemu. Die vorherigen internen Komplettpakete sind wegen unvollständiger versionsgenauer QEMU-Unterlagen nicht zur öffentlichen Weitergabe vorbereitet.
+
+Die App verwendet zuerst https://diskshift.dye.de/downloads.json für Updates. Der Versionsknopf öffnet die öffentliche Downloadseite. Der Support-Server ist für ALL-INKL/PHP implementiert; Einrichtung und produktiver GitHub-App-Test sind noch offen. Siehe server/README.md.
+
+## Historische Entwicklungsnotizen zu früheren internen Paketen
 # DYE.DiskShift 0.2.3
 
 Deutscher Windows-Konverter für virtuelle Festplatten. QEMU wird als separater Prozess verwendet. Gestaltung angelehnt an DYE PDF Studio.
@@ -50,4 +59,5 @@ Der Versionsknopf öffnet den Release-Tag der tatsächlich laufenden Programmver
 Fehler melden öffnet ein eigenes Fenster mit Zusammenfassung, Problem, Reproduktionsschritten und erwartetem Ergebnis. Der Bericht kann kopiert oder in einem GitHub-Issueformular vorbereitet werden. Es wird kein Issue automatisch erstellt. Ein ausgewählter Screenshot muss im Browser selbst angehängt werden; Dateipfade und Logs werden nicht automatisch beigefügt.
 Beim Start erfolgt eine Updateprüfung, zusätzlich manuell über Updates. Neue Releases werden automatisch in einem Fenster angezeigt. Testreleases werden berücksichtigt. Ohne verfügbaren Zugriff wird kein Aktualitätsversprechen angezeigt. Das private Repository erfordert eine angemeldete GitHub-CLI unter dem Standard-Installationspfad; ohne CLI wird eine nicht authentifizierte API-Abfrage versucht, die bei privaten Repositories keinen Zugriff hat. Kein eingebauter Token und kein automatischer Download oder Programmaustausch.
 14 automatisierte Prüfungen bestanden (11 Konverterprüfungen und 3 Versionsvergleichsprüfungen); Bericht- und Updatefenster visuell geprüft. GitHub-Issues wurden beim Test nicht eingereicht.
+
 
