@@ -32,9 +32,13 @@ await Check("Snapshot-Kette abgewiesen", async () => {
 await Check("Quelldaten unverändert", () => { if(sourceHash!=Convert.ToHexString(System.Security.Cryptography.SHA256.HashData(File.ReadAllBytes(raw)))) throw new Exception("Hash verändert"); return Task.CompletedTask; });
 await Check("Keine temporären Restordner", () => { if(Directory.GetDirectories(folder,".diskshift-*").Length!=0) throw new Exception("Restordner vorhanden"); return Task.CompletedTask; });
 if(args.Length > 1) await Check("Reales Parallels-Image nur lesend erkennen", async () => { var info = await engine.Inspect(args[1], default); if(info.Format != "parallels") throw new Exception("Kein Parallels-Image"); });
+await Check("Updatevergleich erkennt neuere Version", () => { var r=Updates.Parse("[{\"draft\":false,\"tag_name\":\"v0.2.4\",\"html_url\":\"https://github.com/Hartwigsen/DYE.DiskShift/releases/tag/v0.2.4\"}]",new Version(0,2,3)); if(r.Url==null) throw new Exception("Update fehlt"); return Task.CompletedTask; });
+await Check("Gleiche Version ist kein Update", () => { var r=Updates.Parse("[{\"draft\":false,\"tag_name\":\"v0.2.3\",\"html_url\":\"https://github.com/Hartwigsen/DYE.DiskShift/releases/tag/v0.2.3\"}]",new Version(0,2,3)); if(r.Url!=null) throw new Exception("Falsches Update"); return Task.CompletedTask; });
+await Check("Fremde Release-URL wird ignoriert", () => { var r=Updates.Parse("[{\"draft\":false,\"tag_name\":\"v9.0.0\",\"html_url\":\"https://example.com/release\"}]",new Version(0,2,3)); if(r.Url!=null) throw new Exception("Fremdes Ziel"); return Task.CompletedTask; });
 await File.WriteAllLinesAsync(Path.Combine(folder,"results.txt"),results);
 foreach(var result in results) Console.WriteLine(result);
 Environment.ExitCode=results.Any(r=>r.StartsWith("FAIL"))?1:0;
 sealed class ImmediateProgress(Action<(double,string)> callback):IProgress<(double,string)> { public void Report((double,string) p)=>callback(p); }
+
 
 

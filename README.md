@@ -1,9 +1,9 @@
-# DYE.DiskShift 0.2.2
+# DYE.DiskShift 0.2.3
 
 Deutscher Windows-Konverter für virtuelle Festplatten. QEMU wird als separater Prozess verwendet. Gestaltung angelehnt an DYE PDF Studio.
 
 ## Start
-Release-0.2.2\DYE.DiskShift.exe ausführen. Der gesamte Ordner muss zusammenbleiben. .NET und qemu-img sind enthalten; keine separate QEMU-Installation erforderlich. Windows x64. Auf einem zweiten, frischen Rechner noch nicht geprüft.
+Release-0.2.3\DYE.DiskShift.exe ausführen. Der gesamte Ordner muss zusammenbleiben. .NET und qemu-img sind enthalten; keine separate QEMU-Installation erforderlich. Windows x64. Auf einem zweiten, frischen Rechner noch nicht geprüft.
 
 ## Funktionen
 - Lokale Quellformate: Parallels/HDS, VHD, VHDX, VMDK, QCOW2, RAW.
@@ -30,18 +30,24 @@ qemu-img 11.1.0 (v11.1.0-12130-ge470268ff4) aus der vorhandenen lokalen Installa
 Die Lizenztexte von .NET/WPF sowie QEMU liegen unter licenses. Die vollständigen versionsgenauen Quellen und Unterlagen der QEMU-DLLs sind noch offen. Dieses Paket ist für lokale Erprobung, noch nicht für kommerzielle Weitergabe vorbereitet. Siehe licenses/QEMU-Komponenten.md. Die Lizenz der DYE-GUI ist noch nicht festgelegt.
 
 ## Entwicklung
-Build: dotnet publish src\DiskShift.csproj -c Release -r win-x64 --self-contained true -o Release-0.2.2
+Build: dotnet publish src\DiskShift.csproj -c Release -r win-x64 --self-contained true -o Release-0.2.3
 Tests: dotnet run --project tests\Smoke.csproj -- "E:\##Projet-2026\DYE DiskShift"
 Das qemu-Unterverzeichnis muss aus dem geprüften Paket übernommen werden. Quellcode: src/. Keine externen NuGet-Bibliotheken außerhalb der .NET-Laufzeit.
 
 ## Bildzeichen
 assets/DYE.DiskShift-Logo.png und assets/DYE.DiskShift.ico. Bildzeichen mit ImageGen erzeugt: versetzte Datenträger mit gegenläufigen Pfeilen, Mint/Petrol, transparenter Hintergrund, ohne Text.
 
-## Kopfzeile 0.2.2
+## Kopfzeile 0.2.3
 Kompakte dunkle Kopfzeile nach dem SolidCraft-Beispiel mit Logo, Datei-Menü, aktuellem Dateinamen, Hilfe, Lizenzen, Version und integrierten Fensterknöpfen. Menü und Maximieren/Wiederherstellen visuell geprüft. Der Konvertierungskern wurde dabei nicht geändert.
 
 
 ## GitHub
 Privates Repository: https://github.com/Hartwigsen/DYE.DiskShift
 Der Versionsknopf öffnet den Release-Tag der tatsächlich laufenden Programmversion. Zugriff auf private Releases erfordert ein berechtigtes GitHub-Konto.
+
+
+## Fehlerberichte und Updates (0.2.3)
+Fehler melden öffnet ein eigenes Fenster mit Zusammenfassung, Problem, Reproduktionsschritten und erwartetem Ergebnis. Der Bericht kann kopiert oder in einem GitHub-Issueformular vorbereitet werden. Es wird kein Issue automatisch erstellt. Ein ausgewählter Screenshot muss im Browser selbst angehängt werden; Dateipfade und Logs werden nicht automatisch beigefügt.
+Beim Start erfolgt eine Updateprüfung, zusätzlich manuell über Updates. Neue Releases werden automatisch in einem Fenster angezeigt. Testreleases werden berücksichtigt. Ohne verfügbaren Zugriff wird kein Aktualitätsversprechen angezeigt. Das private Repository erfordert eine angemeldete GitHub-CLI unter dem Standard-Installationspfad; ohne CLI wird eine nicht authentifizierte API-Abfrage versucht, die bei privaten Repositories keinen Zugriff hat. Kein eingebauter Token und kein automatischer Download oder Programmaustausch.
+14 automatisierte Prüfungen bestanden (11 Konverterprüfungen und 3 Versionsvergleichsprüfungen); Bericht- und Updatefenster visuell geprüft. GitHub-Issues wurden beim Test nicht eingereicht.
 

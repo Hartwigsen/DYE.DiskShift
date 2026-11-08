@@ -15,7 +15,7 @@ public partial class MainWindow : Window
         InitializeComponent();
         PreviewKeyDown += (_, e) => { if (e.Key == System.Windows.Input.Key.F1) { ShowHelp(this, new RoutedEventArgs()); e.Handled = true; } };
         Closing += (_, e) => { if (operation != null) { e.Cancel = true; MessageBox.Show(this, "Bitte zuerst den laufenden Vorgang abbrechen und dessen Ende abwarten.", "Vorgang läuft"); } };
-        Loaded += async (_, _) => { try { EngineStatus.Text = (await engine.Version(CancellationToken.None)).Split('\n')[0].Trim(); } catch (Exception ex) { EngineStatus.Text = "QEMU nicht verfügbar"; Status.Text = ex.Message; } };
+        Loaded += async (_, _) => { try { EngineStatus.Text = (await engine.Version(CancellationToken.None)).Split('\n')[0].Trim(); } catch (Exception ex) { EngineStatus.Text = "QEMU nicht verfügbar"; Status.Text = ex.Message; } await RunUpdateCheck(false); };
     }
     private void MinimizeWindow(object sender, RoutedEventArgs e) => WindowState = WindowState.Minimized;
     private void MaximizeWindow(object sender, RoutedEventArgs e) => WindowState = WindowState == WindowState.Maximized ? WindowState.Normal : WindowState.Maximized;
@@ -31,6 +31,22 @@ public partial class MainWindow : Window
         }
         try { System.Diagnostics.Process.Start(new System.Diagnostics.ProcessStartInfo(repository!.TrimEnd('/') + "/releases/tag/v" + (typeof(MainWindow).Assembly.GetName().Version?.ToString(3) ?? "0.2.2")) { UseShellExecute = true }); }
         catch (Exception ex) { MessageBox.Show(this, "Die Release-Seite konnte nicht geöffnet werden: " + ex.Message); }
+    }
+    private bool checkingUpdates;
+    private void ShowReport(object sender, RoutedEventArgs e) => new ReportWindow(this).ShowDialog();
+    private async void CheckUpdates(object sender, RoutedEventArgs e) => await RunUpdateCheck(true);
+    private async Task RunUpdateCheck(bool showResult)
+    {
+        if (checkingUpdates) return;
+        checkingUpdates = true; UpdateButton.IsEnabled = false; UpdateButton.ToolTip = "Updateprüfung läuft …";
+        try
+        {
+            var result = await Updates.Check();
+            UpdateButton.Content = result.Url == null ? "Updates" : "↑ Update verfügbar";
+            UpdateButton.ToolTip = result.Message;
+            if (showResult || result.Url != null) new UpdateWindow(this, result).ShowDialog();
+        }
+        finally { checkingUpdates = false; UpdateButton.IsEnabled = true; }
     }
     private void ShowHelp(object sender, RoutedEventArgs e) => new InfoWindow(this, false).ShowDialog();
     private void ShowLicenses(object sender, RoutedEventArgs e) => new InfoWindow(this, true).ShowDialog();
@@ -89,5 +105,6 @@ public partial class MainWindow : Window
     }
     private void Cancel(object sender, RoutedEventArgs e) { CancelButton.IsEnabled = false; operation?.Cancel(); Status.Text = "Vorgang wird abgebrochen …"; }
 }
+
 
 
