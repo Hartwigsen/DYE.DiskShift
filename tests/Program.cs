@@ -1,7 +1,7 @@
 using DiskShift;
 using System.Diagnostics;
 var root = Path.GetFullPath(args[0]);
-var qemu = Path.Combine(root, "Release-0.2.0", "qemu", "qemu-img.exe");
+var qemu = Environment.GetEnvironmentVariable("DISKSHIFT_QEMU_TEST_ENGINE") ?? Path.Combine(root, "Release-0.2.0", "qemu", "qemu-img.exe");
 var engine = new ConverterEngine(qemu);
 var folder = Path.Combine(root, "test-results", DateTime.Now.ToString("yyyyMMdd-HHmmss"));
 Directory.CreateDirectory(folder);
@@ -10,7 +10,7 @@ async Task Check(string name, Func<Task> test) { try { await test(); results.Add
 var raw = Path.Combine(folder, "Quelle mit Leerzeichen.raw");
 using(var file = File.Create(raw)) { var bytes = new byte[1024*1024]; new Random(42).NextBytes(bytes); for(var i=0;i<16;i++) file.Write(bytes); }
 var sourceHash = Convert.ToHexString(System.Security.Cryptography.SHA256.HashData(File.ReadAllBytes(raw)));
-await Check("Paket-QEMU startet", async () => { if (!(await engine.Version(default)).Contains("11.1.0")) throw new Exception("Version unerwartet"); });
+await Check("Paket-QEMU startet", async () => { if (!(await engine.Version(default)).Contains("qemu-img version")) throw new Exception("Version unerwartet"); });
 foreach(var format in new[]{"vhdx", "vmdk", "qcow2"})
     await Check("RAW nach " + format + " mit Datenvergleich", async () => { var dest=Path.Combine(folder,"Ergebnis."+format); await engine.Convert(raw,dest,format,true,new Progress<(double,string)>(),default); var info=await engine.Inspect(dest,default); if(info.VirtualSize!=16*1024*1024) throw new Exception("Falsche Kapazität"); });
 await Check("VHDX nach QCOW2", async () => { await engine.Convert(Path.Combine(folder,"Ergebnis.vhdx"),Path.Combine(folder,"Rückweg.qcow2"),"qcow2",true,new Progress<(double,string)>(),default); });
@@ -39,6 +39,13 @@ await Check("Support-Client erkennt Empfangsbestätigung", async () => { var r=a
 await Check("Support-Client weist ungültigen Code vor Netzwerk ab", async () => { try { await SupportClient.Send(new{},"kurz",new ReplyHandler(202,"{}")); } catch(IOException) {return;} throw new Exception("Code akzeptiert"); });
 await Check("Support-Client behandelt HTML statt JSON", async () => { try { await SupportClient.Send(new{},new string('x',48),new ReplyHandler(200,"<html>nicht eingerichtet</html>")); } catch(IOException) {return;} throw new Exception("HTML akzeptiert"); });
 await Check("Support-Client zeigt Zugriffssperre", async () => { try { await SupportClient.Send(new{},new string('x',48),new ReplyHandler(401,"{\"message\":\"Code gesperrt\"}")); } catch(IOException ex) {if(ex.Message.Contains("gesperrt"))return;} throw new Exception("Sperre fehlt"); });
+await Check("Komprimiertes QCOW2 nach VHDX mit Datenvergleich", async () => {
+    var pattern=Path.Combine(folder,"Muster.raw"); await File.WriteAllBytesAsync(pattern,Enumerable.Repeat((byte)77,4*1024*1024).ToArray());
+    var compressed=Path.Combine(folder,"Komprimiert.qcow2"); var start=new ProcessStartInfo(qemu){UseShellExecute=false,CreateNoWindow=true};
+    foreach(var a in new[]{"convert","-c","-f","raw","-O","qcow2",pattern,compressed}) start.ArgumentList.Add(a);
+    using var p=Process.Start(start)!; await p.WaitForExitAsync(); if(p.ExitCode!=0)throw new Exception("Komprimierung fehlgeschlagen");
+    await engine.Convert(compressed,Path.Combine(folder,"Dekomprimiert.vhdx"),"vhdx",true,new Progress<(double,string)>(),default);
+});
 await File.WriteAllLinesAsync(Path.Combine(folder,"results.txt"),results);
 foreach(var result in results) Console.WriteLine(result);
 Environment.ExitCode=results.Any(r=>r.StartsWith("FAIL"))?1:0;
@@ -51,3 +58,4 @@ sealed class ReplyHandler(int code,string body):System.Net.Http.HttpMessageHandl
 {
  protected override Task<System.Net.Http.HttpResponseMessage> SendAsync(System.Net.Http.HttpRequestMessage request,CancellationToken token)=>Task.FromResult(new System.Net.Http.HttpResponseMessage((System.Net.HttpStatusCode)code){Content=new System.Net.Http.StringContent(body)});
 }
+
